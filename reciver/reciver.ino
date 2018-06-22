@@ -55,7 +55,6 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
 
 byte hashCreator(int iBuffer, char sendOrRecive){
   byte r = 0;
-  byte Buffer[10];
   if(sendOrRecive =='r'){
   for(int i=0; i < iBuffer;i++){
     r = r + recivedBuffer[i];
