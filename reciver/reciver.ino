@@ -51,8 +51,6 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
 }//--(end main loop )---
 
 
-
-
 byte hashCreator(int iBuffer, char sendOrRecive){
   byte r = 0;
   if(sendOrRecive =='r'){
@@ -67,18 +65,20 @@ byte hashCreator(int iBuffer, char sendOrRecive){
 }
 
   
-void sender(int i){//Takes sendBuffer size as input
+void sender(int i){//Takes sendBuffer size as input // 0< i <=9
 char feedback;
+int giveUpCounter = 0;   
   do{
-    bufferSend(i);
+    bufferSend(i); // 0< i <=9 
     feedback = getFeedback();
-  }while(feedback=='E');
+    giveUpCounter++;
+  }while(feedback=='E' and giveUpCounter != 5 );
   if(feedback == 'R'){
-    dataReciver(true,true);
+    dataReciver(true,false);
     }
 }
 
-void bufferSend(int iBuffer){
+void bufferSend(int iBuffer){ // 0< i <=9
   sendBuffer[iBuffer] = hashCreator(iBuffer,'s');
   enableTransmit();
   for(int i=0; i < iBuffer+1;i++){
@@ -98,12 +98,13 @@ void dataReciver(bool exeptAnswerNow, bool sendResponse){
         enableTransmit();
         for(int j =0; j<10;j++)RS485Serial.write(recivedBuffer[j]);
         disableTransmit();  
-}else sendFeedback('O');
+    }else sendFeedback('O');
 }
+
 bool bufferRecive(){
-  int i = 0;
+  int i=0;
   int delayTimer;
-  int timeOutTimer = millis();
+  long timeOutTimer = millis();
   while(millis() - timeOutTimer < 1000){
     if (RS485Serial.available()) {
       delayTimer = millis();    
@@ -111,7 +112,9 @@ bool bufferRecive(){
       recivedBuffer[i] = a;
       i++;
     }
-    if((i != 0) and (i == 9 or millis()-delayTimer > 100)){return i;}
+    if((i != 0) and (i == 9 or millis()-delayTimer > 100)){
+      return i;
+      }
   }
   return false;
 }
@@ -122,6 +125,8 @@ bool checker(int iBuffer){
 }
 
 char getFeedback(){
+      Serial.println("getFeedback");
+
   if (checker(bufferRecive()))return recivedBuffer[0];
   else return 'E';
   }
@@ -131,4 +136,3 @@ void sendFeedback(char charToSend){
 }
 void enableTransmit() {digitalWrite(SSerialTxControl, RS485Transmit);}  // Enable RS485 Transmit
 void disableTransmit() {digitalWrite(SSerialTxControl, RS485Receive); } // Disable RS485 Transmit    
-

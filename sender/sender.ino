@@ -46,9 +46,10 @@ void setup()   /****** SETUP: RUNS ONCE ******/
 
 void loop()   /****** LOOP: RUNS CONSTANTLY ******/
 {
-  int i;
+        Serial.println("loop");
+  int i=0;
   int delayTimer = 0;
-  int timeOutTimer = millis();
+  long timeOutTimer = millis();
   while(millis() - timeOutTimer < 1000){
     if (Serial.available()) {
       delayTimer = millis();    
@@ -57,7 +58,7 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
        i++;
     }
     if((i != 0) and (i == 9 or millis()-delayTimer > 100))
-    {sender(i);
+    {sender(i); // 0< i <=9
     return;
     }
   }
@@ -80,18 +81,20 @@ byte hashCreator(int iBuffer, char sendOrRecive){
 }
 
   
-void sender(int i){//Takes sendBuffer size as input
+void sender(int i){//Takes sendBuffer size as input // 0< i <=9
 char feedback;
+int giveUpCounter = 0;   
   do{
-    bufferSend(i);
+    bufferSend(i); // 0< i <=9 
     feedback = getFeedback();
-  }while(feedback=='E');
+    giveUpCounter++;
+  }while(feedback=='E' and giveUpCounter != 5 );
   if(feedback == 'R'){
     dataReciver(true,false);
     }
 }
 
-void bufferSend(int iBuffer){
+void bufferSend(int iBuffer){ // 0< i <=9
   sendBuffer[iBuffer] = hashCreator(iBuffer,'s');
   enableTransmit();
   for(int i=0; i < iBuffer+1;i++){
@@ -116,7 +119,7 @@ void dataReciver(bool exeptAnswerNow, bool sendResponse){
 bool bufferRecive(){
   int i=0;
   int delayTimer;
-  int timeOutTimer = millis();
+  long timeOutTimer = millis();
   while(millis() - timeOutTimer < 1000){
     if (RS485Serial.available()) {
       delayTimer = millis();    
@@ -137,6 +140,8 @@ bool checker(int iBuffer){
 }
 
 char getFeedback(){
+      Serial.println("getFeedback");
+
   if (checker(bufferRecive()))return recivedBuffer[0];
   else return 'E';
   }
