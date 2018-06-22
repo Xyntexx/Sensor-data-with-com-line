@@ -56,7 +56,10 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
       sendBuffer[i] = a;
        i++;
     }
-    if((i != 0) and (i == 9 or millis()-delayTimer > 100)){sender(i);return;}
+    if((i != 0) and (i == 9 or millis()-delayTimer > 100))
+    {sender(i);
+    return;
+    }
   }
 }//--(end main loop )---
 
@@ -65,7 +68,6 @@ void loop()   /****** LOOP: RUNS CONSTANTLY ******/
 
 byte hashCreator(int iBuffer, char sendOrRecive){
   byte r = 0;
-  byte Buffer[10];
   if(sendOrRecive =='r'){
   for(int i=0; i < iBuffer;i++){
     r = r + recivedBuffer[i];
@@ -112,7 +114,7 @@ void dataReciver(bool exeptAnswerNow, bool sendResponse){
 }else sendFeedback('O');
 }
 bool bufferRecive(){
-  int i;
+  int i=0;
   int delayTimer;
   int timeOutTimer = millis();
   while(millis() - timeOutTimer < 1000){
@@ -122,7 +124,9 @@ bool bufferRecive(){
       recivedBuffer[i] = a;
       i++;
     }
-    if((i != 0) and (i == 9 or millis()-delayTimer > 100)){return i;}
+    if((i != 0) and (i == 9 or millis()-delayTimer > 100)){
+      return i;
+      }
   }
   return false;
 }
